@@ -48,7 +48,7 @@ normative:
   I-D.ietf-netconf-keystore:
   I-D.ietf-core-comi:
   I-D.ietf-ace-cbor-web-token:
-  I-D.vanderstok-ace-coap-est:
+  I-D.ietf-ace-coap-est:
   I-D.ietf-core-yang-cbor:
   iec62591:
     target: "https://webstore.iec.ch/publication/24433"
@@ -133,11 +133,14 @@ informative:
 
 --- abstract
 
-This document describes a zero-touch mechanism to enroll a new device (the "pledge")
-into a IEEE802.15.4 TSCH network using the 6tisch signaling mechanisms.  The resulting
-device will obtain a domain specific credential that can be used with either 802.15.9 per-host pair
-keying protocols, or to obtain the network-wide key from a coordinator.  The mechanism
-describe her is an augmentation to the one-touch mechanism described in {{I-D.ietf-6tisch-minimal-security}}.
+This document describes a Zero-touch Secure Join (ZSJ) mechanism to enroll a
+new device (the "pledge") into a IEEE802.15.4 TSCH network using the 6tisch
+signaling mechanisms.  The resulting device will obtain a domain specific
+credential that can be used with either 802.15.9 per-host pair keying
+protocols, or to obtain the network-wide key from a coordinator.  The
+mechanism describe here is an augmentation to the one-touch mechanism
+described in {{I-D.ietf-6tisch-minimal-security}}, and a constrained
+version of {{I-D.ietf-anima-bootstrapping-keyinfra}}.
 
 --- middle
 
@@ -155,32 +158,46 @@ chance, but requires coordination between the manufacturer of the node, the
 service operator running the LLN, and the installers actually taking the
 devices out of the shipping boxes.
 
-This document is a constrained profile of {{I-D.ietf-anima-bootstrapping-keyinfra}}.  The above
-document/protocol is referred by by it's acronym: BRSKI. The pronounciation of which is
-"brew-ski", a common north american slang for beer with a pseudo-polish ending.
+This document is a constrained profile of
+{{I-D.ietf-anima-bootstrapping-keyinfra}}.  The above document/protocol is
+referred by by it's acronym: BRSKI. The pronounciation of which is
+"brew-ski", a common north american slang for beer with a pseudo-polish
+ending.  This constrained protocol is called ZSJ.
 
-This document follows the same structure as it's parent in order to emphasize the similarities,
-but specializes a number of things to constrained networks of constrained devices.
-Like ANIMA's BRSKI, the networks which are in scope for this protocol are deployed by a
-professional operator.  The deterministic mechanisms which have been designed into 6tisch
-have been created to satisfy the operational needs of industrial settings.
+This document follows the same structure as it's parent in order to emphasize
+the similarities, but specializes a number of things to constrained networks
+of constrained devices.
+Like {{I-D.ietf-anima-bootstrapping-keyinfra}}, the networks which are in
+scope for this protocol are deployed by a professional operator.
+The deterministic mechanisms which have been designed into 6tisch have been
+created to satisfy the operational needs of industrial settings where such
+an operator exists.
 
-This document builds upon the "one-touch" provisioning described in {{I-D.ietf-6tisch-minimal-security}},
-reusing the OSCOAP Join Request mechanism when appropriate.
-In addition, it uses the CoAP adaption of EST defined in {{I-D.vanderstok-ace-coap-est}}
-in an identical way.
-
+This document builds upon the "one-touch" provisioning described in
+{{I-D.ietf-6tisch-minimal-security}},
+reusing the OSCOAP Join Request mechanism when appropriate, but preceeding it
+with either the EDHOC key agreement protocol, or a DTLS channel.
+The {{RFC7030}} EST protocol extended in
+{{I-D.ietf-6tisch-minimal-security}}, has been mapped by
+{{I-D.ietf-ace-coap-est}} into CoAP.
 
 Otherwise, this document follows BRSKI with the following high-level changes:
 
 * HTTP is replaced with CoAP.
 * TLS (HTTPS) is replaced with either DTLS+CoAP, or EDHOC/OSCOAP+CoAP
-* the domain-registrar anchor certificate is replaced with a Raw Public Key (RPK) using {{RFC7250}}.
+* the domain-registrar anchor certificate is replaced with a Raw Public Key
+  (RPK) using {{RFC7250}}.
 * the PKCS7 signed JSON voucher format is replaced with CWT
-* the GRASP discovery mechanism for the Proxy is replaced with an announcement in the Enhanced Beacon {{I-D.richardson-6tisch-join-enhanced-beacon}}
-* the TCP circuit proxy mechanism is not used.  The IPIP mechanism if mandatory to implement when deployed with DTLS, while the CoAP based stateless proxy mechanism is used for OSCOAP/EDHOC.
-* real time clocks are assumed to be impossible, so expiry dates in ownership vouchers are never used
-* nonce-full vouchers are encouraged, but off-line nonce-less operation is also supported
+* the GRASP discovery mechanism for the Proxy is replaced with an
+  announcement in the Enhanced Beacon
+  {{I-D.richardson-6tisch-join-enhanced-beacon}}
+* the TCP circuit proxy mechanism is not used.  The IPIP mechanism if
+  mandatory to implement when deployed with DTLS, while the CoAP based
+  stateless proxy mechanism is used for OSCOAP/EDHOC.
+* real time clocks are assumed to be unavailable, so expiry dates in
+  ownership vouchers are never used
+* nonce-full vouchers are encouraged, but off-line nonce-less operation is
+  also supported, however, the resulting vouchers have infinite life.
 
 802.1AR Client certificates are retained, but optionally are specified by reference rather than value.
 
@@ -578,7 +595,8 @@ extension.
 
 # Voucher-Request artifact
 
-As in BRSKI, a voucher-request artifact is derived from the base voucher definition.
+voucher-request artif
+BRSKI, a voucher-request artifact is derived from the base voucher definition.
 The constrained version differs from the non-constrained version in two ways:
 
 1. it does not include the pinned-domain-cert, but rather than pinned-domain-subjet-public-key-info entry.  This accomodates the use of a raw public key to identify the registrar.
@@ -640,7 +658,7 @@ BRSKI is specified to run over HTTPS. This document respecifies it to run over C
 either DTLS or EDHOC-provided OSCOAP security.  There is an emerging (hybrid) possibility
 of DTLS-providing the OSCOAP security, but such a specification does not yet exist.
 
-{{I-D.vanderstok-ace-coap-est}} specifies that CoAP specifies
+{{I-D.ietf-ace-coap-est}} specifies that CoAP specifies
 the use of CoAP Block-Wise Transfer ("Block") {{!RFC7959}} to fragment EST messages at the
 application layer.
 
@@ -651,7 +669,7 @@ been signed by the Raw Public Key that is presented by the Server, even though t
 as yet no trust in that key.  Such a key is often available through APIs that provide for
 channel binding, such as described in {{RFC5056}}.
 
-As in {{I-D.vanderstok-ace-coap-est}}, support for Observe CoAP options {{RFC7641}} with
+As in {{I-D.ietf-ace-coap-est}}, support for Observe CoAP options {{RFC7641}} with
 BRSKI is not supported in the current BRSKI/EST message flows.
 Observe options could be used by the server to notify clients about a change in the cacerts
 or csr  attributes (resources) and might be an area of future work.
@@ -785,7 +803,7 @@ There are no changes to the status telemetry between Registrar and MASA.
 
 ### EST over CoAP
 
-This document and {{I-D.vanderstok-ace-coap-est}} detail how to run EST over CoAP.
+This document and {{I-D.ietf-ace-coap-est}} detail how to run EST over CoAP.
 
 # Reduced security operational modes
 

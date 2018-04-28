@@ -14,13 +14,15 @@ Expires: October 29, 2018                         Silver Spring Networks
 
 Abstract
 
-   This document describes a zero-touch mechanism to enroll a new device
-   (the "pledge") into a IEEE802.15.4 TSCH network using the 6tisch
-   signaling mechanisms.  The resulting device will obtain a domain
-   specific credential that can be used with either 802.15.9 per-host
-   pair keying protocols, or to obtain the network-wide key from a
-   coordinator.  The mechanism describe her is an augmentation to the
-   one-touch mechanism described in [I-D.ietf-6tisch-minimal-security].
+   This document describes a Zero-touch Secure Join (ZSJ) mechanism to
+   enroll a new device (the "pledge") into a IEEE802.15.4 TSCH network
+   using the 6tisch signaling mechanisms.  The resulting device will
+   obtain a domain specific credential that can be used with either
+   802.15.9 per-host pair keying protocols, or to obtain the network-
+   wide key from a coordinator.  The mechanism describe here is an
+   augmentation to the one-touch mechanism described in
+   [I-D.ietf-6tisch-minimal-security], and a constrained version of
+   [I-D.ietf-anima-bootstrapping-keyinfra].
 
 Status of This Memo
 
@@ -48,8 +50,6 @@ Copyright Notice
    Provisions Relating to IETF Documents
    (http://trustee.ietf.org/license-info) in effect on the date of
    publication of this document.  Please review these documents
-   carefully, as they describe your rights and restrictions with respect
-   to this document.  Code Components extracted from this document must
 
 
 
@@ -58,6 +58,8 @@ Richardson & Damm       Expires October 29, 2018                [Page 1]
 Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
+   carefully, as they describe your rights and restrictions with respect
+   to this document.  Code Components extracted from this document must
    include Simplified BSD License text as described in Section 4.e of
    the Trust Legal Provisions and are provided without warranty as
    described in the Simplified BSD License.
@@ -65,7 +67,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     1.1.  Prior Bootstrapping Approaches  . . . . . . . . . . . . .   5
+     1.1.  Prior Bootstrapping Approaches  . . . . . . . . . . . . .   6
      1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   6
      1.3.  Scope of solution . . . . . . . . . . . . . . . . . . . .   7
        1.3.1.  Support environment . . . . . . . . . . . . . . . . .   7
@@ -97,15 +99,13 @@ Table of Contents
      3.1.  Tree Diagram  . . . . . . . . . . . . . . . . . . . . . .  15
      3.2.  SID values  . . . . . . . . . . . . . . . . . . . . . . .  15
      3.3.  YANG Module . . . . . . . . . . . . . . . . . . . . . . .  15
-   4.  Proxy details (Pledge - Proxy - Registrar)  . . . . . . . . .  17
+   4.  Proxying details (Pledge - Proxy - Registrar) . . . . . . . .  17
      4.1.  Pledge discovery of Proxy . . . . . . . . . . . . . . . .  17
      4.2.  CoAP connection to Registrar  . . . . . . . . . . . . . .  17
      4.3.  HTTPS proxy connection to Registrar . . . . . . . . . . .  17
      4.4.  Proxy discovery of Registrar  . . . . . . . . . . . . . .  17
    5.  Protocol Details (Pledge - Registrar - MASA)  . . . . . . . .  17
      5.1.  BRSKI-EST (D)TLS establishment details  . . . . . . . . .  18
-       5.1.1.  BRSKI-EST CoAP/DTLS estasblishment details  . . . . .  18
-       5.1.2.  BRSKI-EST CoAP/EDHOC estasblishment details . . . . .  18
 
 
 
@@ -114,6 +114,8 @@ Richardson & Damm       Expires October 29, 2018                [Page 2]
 Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
+       5.1.1.  BRSKI-EST CoAP/DTLS estasblishment details  . . . . .  18
+       5.1.2.  BRSKI-EST CoAP/EDHOC estasblishment details . . . . .  18
      5.2.  Pledge Requests Voucher from the Registrar  . . . . . . .  18
      5.3.  BRSKI-MASA TLS establishment details  . . . . . . . . . .  19
      5.4.  Registrar Requests Voucher from MASA  . . . . . . . . . .  19
@@ -160,8 +162,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
        A.1.2.  Factory provided credentials (if any) . . . . . . . .  31
        A.1.3.  Credentials to be introduced  . . . . . . . . . . . .  31
      A.2.  Network Assumptions . . . . . . . . . . . . . . . . . . .  32
-       A.2.1.  Security above and below IP . . . . . . . . . . . . .  32
-       A.2.2.  Join network assumptions  . . . . . . . . . . . . . .  33
 
 
 
@@ -170,6 +170,8 @@ Richardson & Damm       Expires October 29, 2018                [Page 3]
 Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
+       A.2.1.  Security above and below IP . . . . . . . . . . . . .  32
+       A.2.2.  Join network assumptions  . . . . . . . . . . . . . .  33
        A.2.3.  Number and cost of round trips  . . . . . . . . . . .  33
        A.2.4.  Size of packets, number of fragments  . . . . . . . .  33
      A.3.  Target end-state for join process . . . . . . . . . . . .  33
@@ -203,21 +205,19 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
    [I-D.ietf-anima-bootstrapping-keyinfra].  The above document/protocol
    is referred by by it's acronym: BRSKI.  The pronounciation of which
    is "brew-ski", a common north american slang for beer with a pseudo-
-   polish ending.
+   polish ending.  This constrained protocol is called ZSJ.
 
    This document follows the same structure as it's parent in order to
    emphasize the similarities, but specializes a number of things to
-   constrained networks of constrained devices.  Like ANIMA's BRSKI, the
-   networks which are in scope for this protocol are deployed by a
-   professional operator.  The deterministic mechanisms which have been
-   designed into 6tisch have been created to satisfy the operational
-   needs of industrial settings.
+   constrained networks of constrained devices.  Like
+   [I-D.ietf-anima-bootstrapping-keyinfra], the networks which are in
+   scope for this protocol are deployed by a professional operator.  The
+   deterministic mechanisms which have been designed into 6tisch have
+   been created to satisfy the operational needs of industrial settings
+   where such an operator exists.
 
    This document builds upon the "one-touch" provisioning described in
    [I-D.ietf-6tisch-minimal-security], reusing the OSCOAP Join Request
-   mechanism when appropriate.  In addition, it uses the CoAP adaption
-   of EST defined in [I-D.vanderstok-ace-coap-est] in an identical way.
-
 
 
 
@@ -225,6 +225,11 @@ Richardson & Damm       Expires October 29, 2018                [Page 4]
 
 Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
+
+   mechanism when appropriate, but preceeding it with either the EDHOC
+   key agreement protocol, or a DTLS channel.  The [RFC7030] EST
+   protocol extended in [I-D.ietf-6tisch-minimal-security], has been
+   mapped by [I-D.ietf-ace-coap-est] into CoAP.
 
    Otherwise, this document follows BRSKI with the following high-level
    changes:
@@ -247,11 +252,12 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
       if mandatory to implement when deployed with DTLS, while the CoAP
       based stateless proxy mechanism is used for OSCOAP/EDHOC.
 
-   o  real time clocks are assumed to be impossible, so expiry dates in
+   o  real time clocks are assumed to be unavailable, so expiry dates in
       ownership vouchers are never used
 
    o  nonce-full vouchers are encouraged, but off-line nonce-less
-      operation is also supported
+      operation is also supported, however, the resulting vouchers have
+      infinite life.
 
    802.1AR Client certificates are retained, but optionally are
    specified by reference rather than value.
@@ -268,12 +274,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
    ACTION, PLEASE REMOVE" and should be removed (along with this
    paragraph) from the final document.
 
-1.1.  Prior Bootstrapping Approaches
-
-   TBD.
-
-
-
 
 
 
@@ -281,6 +281,10 @@ Richardson & Damm       Expires October 29, 2018                [Page 5]
 
 Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
+
+1.1.  Prior Bootstrapping Approaches
+
+   TBD.
 
 1.2.  Terminology
 
@@ -325,10 +329,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
    MIC  manufacturer installed certificate.  An [ieee802-1AR] identity.
       Not to be confused with a (cryptographic) "Message Integrity
       Check"
-
-
-
-
 
 
 
@@ -767,9 +767,9 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 3.  Voucher-Request artifact
 
-   As in BRSKI, a voucher-request artifact is derived from the base
-   voucher definition.  The constrained version differs from the non-
-   constrained version in two ways:
+   voucher-request artif BRSKI, a voucher-request artifact is derived
+   from the base voucher definition.  The constrained version differs
+   from the non-constrained version in two ways:
 
    1.  it does not include the pinned-domain-cert, but rather than
        pinned-domain-subjet-public-key-info entry.  This accomodates the
@@ -906,7 +906,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 }
 <CODE ENDS>
 
-4.  Proxy details (Pledge - Proxy - Registrar)
+4.  Proxying details (Pledge - Proxy - Registrar)
 
    The role of the Proxy is to facilitate communication.  In the
    constrained situation the proxy needs to be stateless.
@@ -941,9 +941,9 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
    There is an emerging (hybrid) possibility of DTLS-providing the
    OSCOAP security, but such a specification does not yet exist.
 
-   [I-D.vanderstok-ace-coap-est] specifies that CoAP specifies the use
-   of CoAP Block-Wise Transfer ("Block") [RFC7959] to fragment EST
-   messages at the application layer.
+   [I-D.ietf-ace-coap-est] specifies that CoAP specifies the use of CoAP
+   Block-Wise Transfer ("Block") [RFC7959] to fragment EST messages at
+   the application layer.
 
 
 
@@ -963,7 +963,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
    available through APIs that provide for channel binding, such as
    described in [RFC5056].
 
-   As in [I-D.vanderstok-ace-coap-est], support for Observe CoAP options
+   As in [I-D.ietf-ace-coap-est], support for Observe CoAP options
    [RFC7641] with BRSKI is not supported in the current BRSKI/EST
    message flows.  Observe options could be used by the server to notify
    clients about a change in the cacerts or csr attributes (resources)
@@ -1243,8 +1243,8 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 5.8.6.  EST over CoAP
 
-   This document and [I-D.vanderstok-ace-coap-est] detail how to run EST
-   over CoAP.
+   This document and [I-D.ietf-ace-coap-est] detail how to run EST over
+   CoAP.
 
 6.  Reduced security operational modes
 
@@ -1441,11 +1441,11 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
               "CBOR Web Token (CWT)", draft-ietf-ace-cbor-web-token-15
               (work in progress), March 2018.
 
-   [I-D.ietf-anima-bootstrapping-keyinfra]
-              Pritikin, M., Richardson, M., Behringer, M., Bjarnason,
-              S., and K. Watsen, "Bootstrapping Remote Secure Key
-              Infrastructures (BRSKI)", draft-ietf-anima-bootstrapping-
-              keyinfra-15 (work in progress), April 2018.
+   [I-D.ietf-ace-coap-est]
+              Stok, P., Kampanakis, P., Kumar, S., Richardson, M.,
+              Furuhed, M., and S. Raza, "EST over secure CoAP (EST-
+              coaps)", draft-ietf-ace-coap-est-00 (work in progress),
+              February 2018.
 
 
 
@@ -1457,6 +1457,12 @@ Richardson & Damm       Expires October 29, 2018               [Page 26]
 
 Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
+
+   [I-D.ietf-anima-bootstrapping-keyinfra]
+              Pritikin, M., Richardson, M., Behringer, M., Bjarnason,
+              S., and K. Watsen, "Bootstrapping Remote Secure Key
+              Infrastructures (BRSKI)", draft-ietf-anima-bootstrapping-
+              keyinfra-15 (work in progress), April 2018.
 
    [I-D.ietf-anima-grasp]
               Bormann, C., Carpenter, B., and B. Liu, "A Generic
@@ -1501,12 +1507,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
               6TiSCH", draft-richardson-6tisch-minimal-rekey-02 (work in
               progress), August 2017.
 
-   [I-D.richardson-anima-6join-discovery]
-              Richardson, M., "GRASP discovery of Registrar by Join
-              Assistant", draft-richardson-anima-6join-discovery-00
-              (work in progress), October 2016.
-
-
 
 
 Richardson & Damm       Expires October 29, 2018               [Page 27]
@@ -1514,16 +1514,15 @@ Richardson & Damm       Expires October 29, 2018               [Page 27]
 Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
+   [I-D.richardson-anima-6join-discovery]
+              Richardson, M., "GRASP discovery of Registrar by Join
+              Assistant", draft-richardson-anima-6join-discovery-00
+              (work in progress), October 2016.
+
    [I-D.selander-ace-cose-ecdhe]
               Selander, G., Mattsson, J., and F. Palombini, "Ephemeral
               Diffie-Hellman Over COSE (EDHOC)", draft-selander-ace-
               cose-ecdhe-08 (work in progress), March 2018.
-
-   [I-D.vanderstok-ace-coap-est]
-              Stok, P., Kampanakis, P., Kumar, S., Richardson, M.,
-              Furuhed, M., and S. Raza, "EST over secure CoAP (EST-
-              coaps)", draft-vanderstok-ace-coap-est-04 (work in
-              progress), January 2018.
 
    [iec62591]
               IEC, ., "62591:2016 Industrial networks - Wireless
@@ -1559,6 +1558,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
               Low-Power Wireless Personal Area Networks (6LoWPANs)",
               RFC 6775, DOI 10.17487/RFC6775, November 2012,
               <https://www.rfc-editor.org/info/rfc6775>.
+
 
 
 
