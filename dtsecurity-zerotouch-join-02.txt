@@ -5,8 +5,8 @@
 6tisch Working Group                                       M. Richardson
 Internet-Draft                                  Sandelman Software Works
 Intended status: Informational                                   B. Damm
-Expires: June 14, 2018                            Silver Spring Networks
-                                                       December 11, 2017
+Expires: October 29, 2018                         Silver Spring Networks
+                                                          April 27, 2018
 
 
                  6tisch Zero-Touch Secure Join protocol
@@ -37,11 +37,11 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on June 14, 2018.
+   This Internet-Draft will expire on October 29, 2018.
 
 Copyright Notice
 
-   Copyright (c) 2017 IETF Trust and the persons identified as the
+   Copyright (c) 2018 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -53,9 +53,9 @@ Copyright Notice
 
 
 
-Richardson & Damm         Expires June 14, 2018                 [Page 1]
+Richardson & Damm       Expires October 29, 2018                [Page 1]
 
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
    include Simplified BSD License text as described in Section 4.e of
@@ -65,110 +65,123 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 Table of Contents
 
    1.  Introduction  . . . . . . . . . . . . . . . . . . . . . . . .   4
-     1.1.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   5
-     1.2.  Scope of solution . . . . . . . . . . . . . . . . . . . .   6
-     1.3.  Leveraging the new key infrastructure / next steps  . . .   6
-       1.3.1.  Key Distribution Process  . . . . . . . . . . . . . .   7
-   2.  Architectural Overview  . . . . . . . . . . . . . . . . . . .   7
-     2.1.  Behaviour of a Pledge . . . . . . . . . . . . . . . . . .   7
-     2.2.  Secure Imprinting using Vouchers  . . . . . . . . . . . .   9
-     2.3.  Initial Device Identifier . . . . . . . . . . . . . . . .   9
-     2.4.  Protocol Flow . . . . . . . . . . . . . . . . . . . . . .  10
-       2.4.1.  Architectural component: Pledge . . . . . . . . . . .  11
-       2.4.2.  Architectural component: Stateless IPIP Proxy . . . .  12
-       2.4.3.  Architectural component: Domain Registrar . . . . . .  12
-       2.4.4.  Architectural component: Vendor Service . . . . . . .  12
-     2.5.  Lack of realtime clock  . . . . . . . . . . . . . . . . .  12
-     2.6.  Cloud Registrar . . . . . . . . . . . . . . . . . . . . .  13
-     2.7.  Determining the MASA to contact . . . . . . . . . . . . .  13
-   3.  Voucher-Request artifact  . . . . . . . . . . . . . . . . . .  13
-     3.1.  Tree Diagram  . . . . . . . . . . . . . . . . . . . . . .  13
-     3.2.  SID values  . . . . . . . . . . . . . . . . . . . . . . .  14
-     3.3.  YANG Module . . . . . . . . . . . . . . . . . . . . . . .  14
-   4.  Proxy details . . . . . . . . . . . . . . . . . . . . . . . .  16
-     4.1.  Pledge discovery of Proxy . . . . . . . . . . . . . . . .  16
-     4.2.  CoAP connection to Registrar  . . . . . . . . . . . . . .  16
-     4.3.  HTTPS proxy connection to Registrar . . . . . . . . . . .  16
-     4.4.  Proxy discovery of Registrar  . . . . . . . . . . . . . .  16
-   5.  Protocol Details  . . . . . . . . . . . . . . . . . . . . . .  16
-     5.1.  BRSKI-EST (D)TLS establishment details  . . . . . . . . .  17
-       5.1.1.  BRSKI-EST CoAP/DTLS estasblishment details  . . . . .  17
-       5.1.2.  BRSKI-EST CoAP/EDHOC estasblishment details . . . . .  17
-     5.2.  Pledge Requests Voucher from the Registrar  . . . . . . .  17
-     5.3.  BRSKI-MASA TLS establishment details  . . . . . . . . . .  18
-     5.4.  Registrar Requests Voucher from MASA  . . . . . . . . . .  18
-     5.5.  Voucher Response  . . . . . . . . . . . . . . . . . . . .  18
-     5.6.  Tree Diagram  . . . . . . . . . . . . . . . . . . . . . .  18
-     5.7.  SID values  . . . . . . . . . . . . . . . . . . . . . . .  18
-     5.8.  YANG Module . . . . . . . . . . . . . . . . . . . . . . .  19
-       5.8.1.  Completing authentication of Provisional TLS
-               connection  . . . . . . . . . . . . . . . . . . . . .  21
-     5.9.  Voucher Status Telemetry  . . . . . . . . . . . . . . . .  21
-     5.10. MASA authorization log Request  . . . . . . . . . . . . .  21
-       5.10.1.  MASA authorization log Response  . . . . . . . . . .  21
+     1.1.  Prior Bootstrapping Approaches  . . . . . . . . . . . . .   5
+     1.2.  Terminology . . . . . . . . . . . . . . . . . . . . . . .   6
+     1.3.  Scope of solution . . . . . . . . . . . . . . . . . . . .   7
+       1.3.1.  Support environment . . . . . . . . . . . . . . . . .   7
+       1.3.2.  Constrained environments  . . . . . . . . . . . . . .   7
+       1.3.3.  Network Access Controls . . . . . . . . . . . . . . .   7
+     1.4.  Leveraging the new key infrastructure / next steps  . . .   7
+       1.4.1.  Key Distribution Process  . . . . . . . . . . . . . .   8
+     1.5.  Requirements for Autonomic Network Infrastructure (ANI)
+           devices . . . . . . . . . . . . . . . . . . . . . . . . .   8
+   2.  Architectural Overview  . . . . . . . . . . . . . . . . . . .   8
+     2.1.  Behavior of a Pledge  . . . . . . . . . . . . . . . . . .   8
+     2.2.  Secure Imprinting using Vouchers  . . . . . . . . . . . .  10
+     2.3.  Initial Device Identifier . . . . . . . . . . . . . . . .  10
+       2.3.1.  Identification of the Pledge  . . . . . . . . . . . .  11
+       2.3.2.  MASA URI extension  . . . . . . . . . . . . . . . . .  11
+     2.4.  Protocol Flow . . . . . . . . . . . . . . . . . . . . . .  11
+     2.5.  Architectural Components  . . . . . . . . . . . . . . . .  13
+       2.5.1.  Pledge  . . . . . . . . . . . . . . . . . . . . . . .  13
+       2.5.2.  Stateless IPIP Join Proxy . . . . . . . . . . . . . .  13
+       2.5.3.  Domain Registrar  . . . . . . . . . . . . . . . . . .  13
+       2.5.4.  Manufacturer Service  . . . . . . . . . . . . . . . .  13
+       2.5.5.  Public Key Infrastructure (PKI) . . . . . . . . . . .  14
+     2.6.  Certificate Time Validation . . . . . . . . . . . . . . .  14
+       2.6.1.  Lack of realtime clock  . . . . . . . . . . . . . . .  14
+       2.6.2.  Infinite Lifetime of IDevID . . . . . . . . . . . . .  14
+     2.7.  Cloud Registrar . . . . . . . . . . . . . . . . . . . . .  14
+     2.8.  Determining the MASA to contact . . . . . . . . . . . . .  14
+   3.  Voucher-Request artifact  . . . . . . . . . . . . . . . . . .  14
+     3.1.  Tree Diagram  . . . . . . . . . . . . . . . . . . . . . .  15
+     3.2.  SID values  . . . . . . . . . . . . . . . . . . . . . . .  15
+     3.3.  YANG Module . . . . . . . . . . . . . . . . . . . . . . .  15
+   4.  Proxy details (Pledge - Proxy - Registrar)  . . . . . . . . .  17
+     4.1.  Pledge discovery of Proxy . . . . . . . . . . . . . . . .  17
+     4.2.  CoAP connection to Registrar  . . . . . . . . . . . . . .  17
+     4.3.  HTTPS proxy connection to Registrar . . . . . . . . . . .  17
+     4.4.  Proxy discovery of Registrar  . . . . . . . . . . . . . .  17
+   5.  Protocol Details (Pledge - Registrar - MASA)  . . . . . . . .  17
+     5.1.  BRSKI-EST (D)TLS establishment details  . . . . . . . . .  18
+       5.1.1.  BRSKI-EST CoAP/DTLS estasblishment details  . . . . .  18
+       5.1.2.  BRSKI-EST CoAP/EDHOC estasblishment details . . . . .  18
 
 
 
-Richardson & Damm         Expires June 14, 2018                 [Page 2]
+Richardson & Damm       Expires October 29, 2018                [Page 2]
 
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
-     5.11. EST Integration for PKI bootstrapping . . . . . . . . . .  21
-       5.11.1.  EST Distribution of CA Certificates  . . . . . . . .  21
-       5.11.2.  EST CSR Attributes . . . . . . . . . . . . . . . . .  21
-       5.11.3.  EST Client Certificate Request . . . . . . . . . . .  21
-       5.11.4.  Enrollment Status Telemetry  . . . . . . . . . . . .  21
-       5.11.5.  EST over CoAP  . . . . . . . . . . . . . . . . . . .  21
-   6.  Reduced security operational modes  . . . . . . . . . . . . .  22
-     6.1.  Trust Model . . . . . . . . . . . . . . . . . . . . . . .  22
-     6.2.  Pledge security reductions  . . . . . . . . . . . . . . .  22
-     6.3.  Registrar security reductions . . . . . . . . . . . . . .  22
-     6.4.  MASA security reductions  . . . . . . . . . . . . . . . .  22
-   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  22
-     7.1.  MIME-Type Registry  . . . . . . . . . . . . . . . . . . .  22
-   8.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  22
-   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  22
-     9.1.  Security of MASA voucher signing key(s) . . . . . . . . .  22
-   10. Privacy Considerations  . . . . . . . . . . . . . . . . . . .  22
-     10.1.  Privacy Considerations for Production network  . . . . .  23
-     10.2.  Privacy Considerations for New Pledges . . . . . . . . .  23
-       10.2.1.  EUI-64 derived address for join time IID . . . . . .  24
-     10.3.  Privacy Considerations for Join Proxy  . . . . . . . . .  24
-   11. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  24
-   12. References  . . . . . . . . . . . . . . . . . . . . . . . . .  24
-     12.1.  Normative References . . . . . . . . . . . . . . . . . .  24
-     12.2.  Informative References . . . . . . . . . . . . . . . . .  28
-   Appendix A.  Extra text . . . . . . . . . . . . . . . . . . . . .  29
-     A.1.  Assumptions . . . . . . . . . . . . . . . . . . . . . . .  29
-       A.1.1.  One-Touch Assumptions . . . . . . . . . . . . . . . .  29
-       A.1.2.  Factory provided credentials (if any) . . . . . . . .  29
-       A.1.3.  Credentials to be introduced  . . . . . . . . . . . .  30
-     A.2.  Network Assumptions . . . . . . . . . . . . . . . . . . .  30
-       A.2.1.  Security above and below IP . . . . . . . . . . . . .  30
-       A.2.2.  Join network assumptions  . . . . . . . . . . . . . .  31
-       A.2.3.  Number and cost of round trips  . . . . . . . . . . .  31
-       A.2.4.  Size of packets, number of fragments  . . . . . . . .  31
-     A.3.  Target end-state for join process . . . . . . . . . . . .  31
-   Appendix B.  Join Protocol  . . . . . . . . . . . . . . . . . . .  32
-     B.1.  Key Agreement process . . . . . . . . . . . . . . . . . .  32
-     B.2.  Provisional Enrollment process  . . . . . . . . . . . . .  33
-   Appendix C.  IANA Considerations  . . . . . . . . . . . . . . . .  34
-   Appendix D.  Protocol Definition  . . . . . . . . . . . . . . . .  34
-     D.1.  Discovery . . . . . . . . . . . . . . . . . . . . . . . .  34
-       D.1.1.  Proxy Discovery Protocol Details  . . . . . . . . . .  35
-       D.1.2.  Registrar Discovery Protocol Details  . . . . . . . .  35
-   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  35
+     5.2.  Pledge Requests Voucher from the Registrar  . . . . . . .  18
+     5.3.  BRSKI-MASA TLS establishment details  . . . . . . . . . .  19
+     5.4.  Registrar Requests Voucher from MASA  . . . . . . . . . .  19
+       5.4.1.  MASA voucher activities . . . . . . . . . . . . . . .  19
+     5.5.  MASA and Registrar Voucher Response . . . . . . . . . . .  19
+       5.5.1.  Tree Diagram  . . . . . . . . . . . . . . . . . . . .  19
+       5.5.2.  Pledge authentication of provisional TLS connection .  22
+     5.6.  Pledge Voucher Status Telemetry . . . . . . . . . . . . .  22
+     5.7.  Registrar audit log request . . . . . . . . . . . . . . .  22
+       5.7.1.  MASA audit log response . . . . . . . . . . . . . . .  22
+       5.7.2.  Registrar audit log verification  . . . . . . . . . .  22
+     5.8.  EST Integration for PKI bootstrapping . . . . . . . . . .  22
+       5.8.1.  EST Distribution of CA Certificates . . . . . . . . .  22
+       5.8.2.  EST CSR Attributes  . . . . . . . . . . . . . . . . .  22
+       5.8.3.  EST Client Certificate Request  . . . . . . . . . . .  22
+       5.8.4.  Enrollment Status Telemetry . . . . . . . . . . . . .  23
+       5.8.5.  Multiple certificates . . . . . . . . . . . . . . . .  23
+       5.8.6.  EST over CoAP . . . . . . . . . . . . . . . . . . . .  23
+   6.  Reduced security operational modes  . . . . . . . . . . . . .  23
+     6.1.  Trust Model . . . . . . . . . . . . . . . . . . . . . . .  23
+     6.2.  Pledge security reductions  . . . . . . . . . . . . . . .  23
+     6.3.  Registrar security reductions . . . . . . . . . . . . . .  23
+     6.4.  MASA security reductions  . . . . . . . . . . . . . . . .  23
+   7.  IANA Considerations . . . . . . . . . . . . . . . . . . . . .  23
+     7.1.  Well-known EST registration . . . . . . . . . . . . . . .  23
+     7.2.  PKIX Registry . . . . . . . . . . . . . . . . . . . . . .  23
+     7.3.  Voucher Status Telemetry  . . . . . . . . . . . . . . . .  24
+     7.4.  DNS Service Names . . . . . . . . . . . . . . . . . . . .  24
+     7.5.  MUD File Extension for the MASA server  . . . . . . . . .  24
+   8.  Privacy Considerations  . . . . . . . . . . . . . . . . . . .  24
+     8.1.  Privacy Considerations for Production network . . . . . .  24
+     8.2.  Privacy Considerations for New Pledges  . . . . . . . . .  24
+       8.2.1.  EUI-64 derived address for join time IID  . . . . . .  25
+     8.3.  Privacy Considerations for Join Proxy . . . . . . . . . .  25
+   9.  Security Considerations . . . . . . . . . . . . . . . . . . .  25
+     9.1.  Security of MASA voucher signing key(s) . . . . . . . . .  25
+   10. Acknowledgements  . . . . . . . . . . . . . . . . . . . . . .  26
+   11. References  . . . . . . . . . . . . . . . . . . . . . . . . .  26
+     11.1.  Normative References . . . . . . . . . . . . . . . . . .  26
+     11.2.  Informative References . . . . . . . . . . . . . . . . .  29
+   Appendix A.  Extra text . . . . . . . . . . . . . . . . . . . . .  31
+     A.1.  Assumptions . . . . . . . . . . . . . . . . . . . . . . .  31
+       A.1.1.  One-Touch Assumptions . . . . . . . . . . . . . . . .  31
+       A.1.2.  Factory provided credentials (if any) . . . . . . . .  31
+       A.1.3.  Credentials to be introduced  . . . . . . . . . . . .  31
+     A.2.  Network Assumptions . . . . . . . . . . . . . . . . . . .  32
+       A.2.1.  Security above and below IP . . . . . . . . . . . . .  32
+       A.2.2.  Join network assumptions  . . . . . . . . . . . . . .  33
 
 
 
-
-
-
-Richardson & Damm         Expires June 14, 2018                 [Page 3]
+Richardson & Damm       Expires October 29, 2018                [Page 3]
 
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
+
+       A.2.3.  Number and cost of round trips  . . . . . . . . . . .  33
+       A.2.4.  Size of packets, number of fragments  . . . . . . . .  33
+     A.3.  Target end-state for join process . . . . . . . . . . . .  33
+   Appendix B.  Join Protocol  . . . . . . . . . . . . . . . . . . .  33
+     B.1.  Key Agreement process . . . . . . . . . . . . . . . . . .  34
+     B.2.  Provisional Enrollment process  . . . . . . . . . . . . .  35
+   Appendix C.  IANA Considerations  . . . . . . . . . . . . . . . .  36
+   Appendix D.  Protocol Definition  . . . . . . . . . . . . . . . .  36
+     D.1.  Discovery . . . . . . . . . . . . . . . . . . . . . . . .  36
+       D.1.1.  Proxy Discovery Protocol Details  . . . . . . . . . .  36
+       D.1.2.  Registrar Discovery Protocol Details  . . . . . . . .  36
+   Authors' Addresses  . . . . . . . . . . . . . . . . . . . . . . .  36
 
 1.  Introduction
 
@@ -205,6 +218,14 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    mechanism when appropriate.  In addition, it uses the CoAP adaption
    of EST defined in [I-D.vanderstok-ace-coap-est] in an identical way.
 
+
+
+
+Richardson & Damm       Expires October 29, 2018                [Page 4]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    Otherwise, this document follows BRSKI with the following high-level
    changes:
 
@@ -217,14 +238,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
       Public Key (RPK) using [RFC7250].
 
    o  the PKCS7 signed JSON voucher format is replaced with CWT
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                 [Page 4]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
    o  the GRASP discovery mechanism for the Proxy is replaced with an
       announcement in the Enhanced Beacon
@@ -248,7 +261,28 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    while also being able bootstrap 6tisch devices over 802.15.4 with few
    changes.
 
-1.1.  Terminology
+   NOTE TO RFC-EDITOR: during production of this document, it was
+   matched against [I-D.ietf-anima-bootstrapping-keyinfra] section by
+   section.  This results in a few sections, such as IANA Considerations
+   where there is no requested activity.  Those sections are marked "NO
+   ACTION, PLEASE REMOVE" and should be removed (along with this
+   paragraph) from the final document.
+
+1.1.  Prior Bootstrapping Approaches
+
+   TBD.
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018                [Page 5]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
+1.2.  Terminology
 
    In this document, the key words "MUST", "MUST NOT", "REQUIRED",
    "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
@@ -275,13 +309,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    Join Proxy (JP):  a stateless relay that provides connectivity
       between the pledge and the join registrar/coordinator.
 
-
-
-Richardson & Damm         Expires June 14, 2018                 [Page 5]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    Join Registrar/Coordinator (JRC):  central entity responsible for
       authentication and authorization of joining nodes.
 
@@ -299,7 +326,19 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
       Not to be confused with a (cryptographic) "Message Integrity
       Check"
 
-1.2.  Scope of solution
+
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018                [Page 6]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
+1.3.  Scope of solution
 
    The solution described in this document is appropriate to enrolling
    between hundreds to hundreds of thousands of diverse devices into a
@@ -320,7 +359,19 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    network, provided that a unique secret key can be installed in each
    device.
 
-1.3.  Leveraging the new key infrastructure / next steps
+1.3.1.  Support environment
+
+   TBD
+
+1.3.2.  Constrained environments
+
+   TBD
+
+1.3.3.  Network Access Controls
+
+   TBD
+
+1.4.  Leveraging the new key infrastructure / next steps
 
    In constrained networks, it is unlikely that an ACP be formed.  This
    document does not preclude such a thing, but it is not mandated.
@@ -330,24 +381,29 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    [I-D.ietf-6tisch-minimal-security].  (XXX - do we need to signal this
    somehow?)
 
-
-
-
-Richardson & Damm         Expires June 14, 2018                 [Page 6]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    The resulting secure channel MAY be instead used to do an enrollment
    of an LDevID as in BRSKI, but the resulting certificate is used to do
    per-pair keying such as described by {{ieee802159}.
 
-1.3.1.  Key Distribution Process
+
+
+
+
+Richardson & Damm       Expires October 29, 2018                [Page 7]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
+1.4.1.  Key Distribution Process
 
    In addition to being used for the initial enrollment process, the
    secure channel may be kept open (and reversed) to use for network
    rekeying.  Such a process is out of scope of this document, please
    see future work such as [I-D.richardson-6tisch-minimal-rekey].
+
+1.5.  Requirements for Autonomic Network Infrastructure (ANI) devices
+
+   TBD
 
 2.  Architectural Overview
 
@@ -364,7 +420,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    mechanism is included for the Registrar to announce it's capabilities
    (XXX)
 
-2.1.  Behaviour of a Pledge
+2.1.  Behavior of a Pledge
 
    The pledge goes through a series of steps which are outlined here at
    a high level.
@@ -389,9 +445,9 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 
 
 
-Richardson & Damm         Expires June 14, 2018                 [Page 7]
+Richardson & Damm       Expires October 29, 2018                [Page 8]
 
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
                    +--------------+
@@ -445,9 +501,9 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 
 
 
-Richardson & Damm         Expires June 14, 2018                 [Page 8]
+Richardson & Damm       Expires October 29, 2018                [Page 9]
 
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
        The registrar identifies itself using a raw public key, while the
@@ -501,9 +557,9 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 
 
 
-Richardson & Damm         Expires June 14, 2018                 [Page 9]
+Richardson & Damm       Expires October 29, 2018               [Page 10]
 
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
 
 
    The pledge should consider it's 802.1AR certificate to be an opaque
@@ -533,6 +589,14 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    EDNOTE: here belongs text about sending only a reference to the
    IDevID rather than the entire certificate
 
+2.3.1.  Identification of the Pledge
+
+   TBD
+
+2.3.2.  MASA URI extension
+
+   TBD
+
 2.4.  Protocol Flow
 
    The diagram from BRSKI is reproduced with some edits:
@@ -546,6 +610,14 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
       |<-RFC4862 IPv6 adr   |                   |                    |
       |                     |                   |                    |
       |<--------------------|                   |                    |
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 11]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
       | Enhanced Beacon     |                   |                    |
       |   periodic broadcast|                   |                    |
       |                     |                   |                    |
@@ -554,14 +626,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
       |<--Registrar DTLS server authentication--|                    |
     [PROVISIONAL accept of server cert]         |                    |
       P---X.509 client authentication---------->|                    |
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 10]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
       P                     |                   |                    |
       P---Voucher Request (include nonce)------>|                    |
       P                     |                   |                    |
@@ -603,22 +667,26 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 
    2.  no mDNS steps, 6tisch only uses Enhanced Beacon
 
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 12]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    3.  nonce-full option is always recommended
 
-2.4.1.  Architectural component: Pledge
+2.5.  Architectural Components
+
+   TBD
+
+2.5.1.  Pledge
 
    The Pledge is the device which is attempting to join.  Until the
    pledge completes the enrollment process, it has network connectivity
    only to the Proxy.
 
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 11]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
-2.4.2.  Architectural component: Stateless IPIP Proxy
+2.5.2.  Stateless IPIP Join Proxy
 
    The stateless CoAP or DTLS Proxy provides CoAP or DTLS connectivity
    (respectively) between the pledge and the registrar.  The stateless
@@ -626,7 +694,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    [I-D.ietf-6tisch-minimal-security] section 5.1.  The stateless DTLS
    mechanism is not yet described (XXX).
 
-2.4.3.  Architectural component: Domain Registrar
+2.5.3.  Domain Registrar
 
    The Domain Registrar (having the formal name Join Registrar/
    Coordinator (JRC)), operates as a CMC Registrar, terminating the EST
@@ -643,14 +711,32 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    documents assumes without loss of generality that the registrar is
    co-located with the 6LBR.
 
-2.4.4.  Architectural component: Vendor Service
+2.5.4.  Manufacturer Service
 
-   The Vendor Service provides two logically seperate functions: the
-   Manufacturer Authorized Signing Authority (MASA), and an ownership
-   tracking/auditing function.  This function is identical to that used
-   by BRSKI, except that a different format voucher is used.
+   The Manufacturer Service provides two logically seperate functions:
+   the Manufacturer Authorized Signing Authority (MASA), and an
+   ownership tracking/auditing function.  This function is identical to
+   that used by BRSKI, except that a different format voucher is used.
 
-2.5.  Lack of realtime clock
+
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 13]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
+2.5.5.  Public Key Infrastructure (PKI)
+
+   TBD
+
+2.6.  Certificate Time Validation
+
+2.6.1.  Lack of realtime clock
 
    For the constrained situation it is assumed that devices have no real
    time clock.  These nodes do have access to a monotonically increasing
@@ -665,21 +751,16 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    off-line deployment, the vouchers will have been generated in advance
    and no nonce-ful operation will not be possible.
 
+2.6.2.  Infinite Lifetime of IDevID
 
+   TBD
 
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 12]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
-2.6.  Cloud Registrar
+2.7.  Cloud Registrar
 
    In 6tisch, the pledge never has network connectivity until it is
    enrolled, so no alternate registrar is ever possible.
 
-2.7.  Determining the MASA to contact
+2.8.  Determining the MASA to contact
 
    There are no changes from BRSKI: the IDevID provided by the pledge
    will contain a MASA URL extension.
@@ -697,6 +778,13 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    2.  the pledge voucher-request is never signed.
 
    An appendix shows detailed examples of CWT format voucher requests.
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 14]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
 3.1.  Tree Diagram
 
@@ -719,41 +807,11 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
           |       yang:date-and-time
           +---- proximity-registrar-subject-public-key-info?   binary
 
-
-
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 13]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
 3.2.  SID values
 
    This definition, translated via the rules in
    [I-D.ietf-core-yang-cbor] to a list of SID values:
 
-
-         SID Assigned to
-   --------- --------------------------------------------------
-     1001150 module ietf-cwt-voucher-request
-     1001151 module ietf-restconf
-     1001152 module ietf-voucher
-     1001153 module ietf-yang-types
-     1001154 data .../ietf-cwt-voucher-request:voucher
-     1001155 data .../assertion
-     1001156 data .../created-on
-     1001157 data .../domain-cert-revocation-checks
-     1001158 data .../expires-on
-     1001159 data .../idevid-issuer
-     1001160 data .../last-renewal-date
-     1001161 data .../nonce
-     1001162 data .../pinned-domain-cert
-     1001163 data .../proximity-registrar-subject-public-key-info
-     1001164 data .../serial-number
-          No .sid file
 
 3.3.  YANG Module
 
@@ -776,15 +834,16 @@ module ietf-cwt-voucher-request {
   contact
    "WG Web:   <http://tools.ietf.org/wg/6tisch/>
     WG List:  <mailto:6tisch@ietf.org>
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 15]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
     Author:   Michael Richardson
               <mailto:mcr+ietf@sandelman.ca>";
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 14]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
   description
    "This module defines the format for a voucher, which is produced by
@@ -831,23 +890,23 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
          The EdDSA algorithm as specified in
          draft-ietf-tls-rfc4492bis-17 SHOULD be supported.
          Support for the DSA algorithm is not recommended.
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 16]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
          Support for the RSA algorithm is a MAY.";
         }
       }
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 15]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
     }
   }
 }
 <CODE ENDS>
 
-4.  Proxy details
+4.  Proxy details (Pledge - Proxy - Registrar)
 
    The role of the Proxy is to facilitate communication.  In the
    constrained situation the proxy needs to be stateless.
@@ -875,7 +934,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    XX.  The address of the registrar otherwise defaults to be that of
    the DODAG root.
 
-5.  Protocol Details
+5.  Protocol Details (Pledge - Registrar - MASA)
 
    BRSKI is specified to run over HTTPS.  This document respecifies it
    to run over CoAP with either DTLS or EDHOC-provided OSCOAP security.
@@ -886,18 +945,19 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    of CoAP Block-Wise Transfer ("Block") [RFC7959] to fragment EST
    messages at the application layer.
 
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 17]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    BRSKI introduces the concept of a provisional state for EST.  The
    same situation must also be added to DTLS: a situation where the
    connection is active but the identity of the Registar has not yet
    been confirmed.  The DTLS MUST validate that the exchange has been
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 16]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    signed by the Raw Public Key that is presented by the Server, even
    though there is as yet no trust in that key.  Such a key is often
    available through APIs that provide for channel binding, such as
@@ -942,17 +1002,18 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 
    In order to simplify the pledge, the use of a certificate (and chain)
    for the Registrar is not supported.  Instead the newly defined
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 18]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    pinned-domain-subject-public-key-info must contain the (raw) public
    key info for the Registrar.  It MUST be byte for byte identical to
    that which is transmitted by the Registrar during the TLS
    ServerCertificate handshake.
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 17]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
    BRSKI permits the voucher request to be signed or unsigned.  This
    document defines the voucher request to be unsigned.
@@ -973,11 +1034,37 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    pledge, and will issue a 406 (Conflict) error to the Registrar if the
    Registar's public key format is not supported by the pledge.
 
-5.5.  Voucher Response
+5.4.1.  MASA voucher activities
+
+   TBD
+
+5.5.  MASA and Registrar Voucher Response
 
    The format of the voucher is CWT as described in CWT RFC section YYY.
 
-5.6.  Tree Diagram
+5.5.1.  Tree Diagram
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 19]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
    module: ietf-cwt-voucher
 
@@ -997,39 +1084,13 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
           |       yang:date-and-time
           +---- pinned-domain-subject-public-key-info?   binary
 
-5.7.  SID values
+5.5.1.1.  SID values
 
    This definition, translated via the rules in
    [I-D.ietf-core-yang-cbor] to a list of SID values:
 
 
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 18]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
-         SID Assigned to
-   --------- --------------------------------------------------
-     1001100 module ietf-cwt-voucher
-     1001101 module ietf-restconf
-     1001102 module ietf-voucher
-     1001103 module ietf-yang-types
-     1001104 data .../ietf-cwt-voucher:voucher
-     1001105 data .../assertion
-     1001106 data .../created-on
-     1001107 data .../domain-cert-revocation-checks
-     1001108 data .../expires-on
-     1001109 data .../idevid-issuer
-     1001110 data .../last-renewal-date
-     1001111 data .../nonce
-     1001112 data .../pinned-domain-cert
-     1001113 data .../pinned-domain-subject-public-key-info
-     1001114 data .../serial-number
-          No .sid file
-
-5.8.  YANG Module
+5.5.1.2.  YANG Module
 
  <CODE BEGINS> file "ietf-cwt-voucher.yang"
  /* -*- c -*- */
@@ -1053,18 +1114,19 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
      Author:   Michael Richardson
                <mailto:mcr+ietf@sandelman.ca>";
 
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 20]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    description
     "This module defines the format for a voucher, which is produced by
      a pledge's manufacturer or delegate (MASA) to securely assign one
      or more pledges to an 'owner', so that the pledges may establish a
      secure connection to the owner's network infrastructure.
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 19]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
      This version provides a very restricted subset appropriate
      for very constrained devices.
@@ -1108,21 +1170,19 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
          }
        }
      }
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 21]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    }
  }
  <CODE ENDS>
 
-
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 20]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
-5.8.1.  Completing authentication of Provisional TLS connection
+5.5.2.  Pledge authentication of provisional TLS connection
 
    The BRSKI process uses the pinned-domain-cert field of the voucher to
    validate the registrar's ServerCertificate.  In the ZeroTouch case,
@@ -1130,53 +1190,61 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    field containing the raw public key of the certificate.  It should
    match, byte-to-byte with the raw public key ServerCertificate.
 
-5.9.  Voucher Status Telemetry
+5.6.  Pledge Voucher Status Telemetry
 
    The voucher status telemetry report is communicated from the pledge
    to the registrar over CoAP channel.  The shortened URL is as
    described in table QQQ.
 
-5.10.  MASA authorization log Request
+5.7.  Registrar audit log request
 
-   There are no changes to the MASA audit log request.
+   There are no changes to the Registrar audit log request.
 
-5.10.1.  MASA authorization log Response
+5.7.1.  MASA audit log response
 
    There are no changes to the MASA audit log response.
 
-5.11.  EST Integration for PKI bootstrapping
+5.7.2.  Registrar audit log verification
 
-   There.
+   There are no changes to how the Registrar verifies the audit log.
 
-5.11.1.  EST Distribution of CA Certificates
-
-   TBD.
-
-5.11.2.  EST CSR Attributes
+5.8.  EST Integration for PKI bootstrapping
 
    TBD.
 
-5.11.3.  EST Client Certificate Request
+5.8.1.  EST Distribution of CA Certificates
 
    TBD.
 
-5.11.4.  Enrollment Status Telemetry
+5.8.2.  EST CSR Attributes
+
+   TBD.
+
+5.8.3.  EST Client Certificate Request
+
+   TBD.
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 22]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
+5.8.4.  Enrollment Status Telemetry
 
    There are no changes to the status telemetry between Registrar and
    MASA.
 
-5.11.5.  EST over CoAP
+5.8.5.  Multiple certificates
+
+5.8.6.  EST over CoAP
 
    This document and [I-D.vanderstok-ace-coap-est] detail how to run EST
    over CoAP.
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 21]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
 6.  Reduced security operational modes
 
@@ -1202,46 +1270,52 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 
    XXX
 
-7.1.  MIME-Type Registry
+7.1.  Well-known EST registration
 
    XXX
 
-8.  IANA Considerations
-
-   ## PKIX Registry . . . . . . . . . . . . . . . . . . . . . .  46 ##
-   Voucher Status Telemetry . . . . . . . . . . . . . . . .  47
-
-9.  Security Considerations
+7.2.  PKIX Registry
 
    TBD
 
-9.1.  Security of MASA voucher signing key(s)
+
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 23]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
+7.3.  Voucher Status Telemetry
 
    TBD
 
-10.  Privacy Considerations
+7.4.  DNS Service Names
+
+   TBD
+
+7.5.  MUD File Extension for the MASA server
+
+   TBD
+
+8.  Privacy Considerations
 
    [I-D.ietf-6lo-privacy-considerations] details a number of privacy
    considerations important in Resource Constrained nodes.  There are
    two networks and three sets of constrained nodes to consider.  They
    are: 1. the production nodes on the production network.  2. the new
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 22]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    pledges, which have yet to enroll, and which are on a join network.
    3. the production nodes which are also acting as proxy nodes.
 
-10.1.  Privacy Considerations for Production network
+8.1.  Privacy Considerations for Production network
 
    The details of this are out of scope for this document.
 
-10.2.  Privacy Considerations for New Pledges
+8.2.  Privacy Considerations for New Pledges
 
    New Pledges do not yet receive Router Advertisements with PIO
    options, and so configure link-local addresses only based upon
@@ -1265,6 +1339,13 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    [I-D.ietf-6tisch-minimal-security]), or in the equivalent DTLS
    stateless proxy option (reference TBD).
 
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 24]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    This need not be a manufacturer created EUI-64 as assigned by IEEE;
    it could be another value with higher entropy and less interesting
    vendor/device information.  Regardless of what is chosen, it can be
@@ -1283,13 +1364,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    visible to passive observers in the 802.11AR IDevID certificate that
    is sent.
 
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 23]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    Even when TLS 1.3 is used, an active attacker could collect the
    information by creating a rogue proxy.
 
@@ -1297,7 +1371,7 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    assignment or created through another process during manufacturing
    time) is encouraged.
 
-10.2.1.  EUI-64 derived address for join time IID
+8.2.1.  EUI-64 derived address for join time IID
 
    The IID used in the link-local address used during the join process
    be a vendor assigned EUI-64.  After the join process has concluded,
@@ -1306,17 +1380,35 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    64) for use at link-layer address.  At that point, all layer-3
    content is encrypted by the layer-2 key.
 
-10.3.  Privacy Considerations for Join Proxy
+8.3.  Privacy Considerations for Join Proxy
 
    TBD.
 
-11.  Acknowledgements
+9.  Security Considerations
+
+   TBD
+
+9.1.  Security of MASA voucher signing key(s)
+
+   TBD
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 25]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
+10.  Acknowledgements
 
    Kristofer Pister helped with many non-IETF references.
 
-12.  References
+11.  References
 
-12.1.  Normative References
+11.1.  Normative References
 
    [cullenCiscoPhoneDeploy]
               Jennings, C., "Transitive Trust Enrollment for Constrained
@@ -1336,32 +1428,35 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    [I-D.ietf-6tisch-minimal-security]
               Vucinic, M., Simon, J., Pister, K., and M. Richardson,
               "Minimal Security Framework for 6TiSCH", draft-ietf-
-              6tisch-minimal-security-04 (work in progress), October
-              2017.
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 24]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
+              6tisch-minimal-security-05 (work in progress), March 2018.
 
    [I-D.ietf-6tisch-terminology]
               Palattella, M., Thubert, P., Watteyne, T., and Q. Wang,
-              "Terminology in IPv6 over the TSCH mode of IEEE
-              802.15.4e", draft-ietf-6tisch-terminology-09 (work in
-              progress), June 2017.
+              "Terms Used in IPv6 over the TSCH mode of IEEE 802.15.4e",
+              draft-ietf-6tisch-terminology-10 (work in progress), March
+              2018.
 
    [I-D.ietf-ace-cbor-web-token]
               Jones, M., Wahlstroem, E., Erdtman, S., and H. Tschofenig,
-              "CBOR Web Token (CWT)", draft-ietf-ace-cbor-web-token-09
-              (work in progress), October 2017.
+              "CBOR Web Token (CWT)", draft-ietf-ace-cbor-web-token-15
+              (work in progress), March 2018.
 
    [I-D.ietf-anima-bootstrapping-keyinfra]
               Pritikin, M., Richardson, M., Behringer, M., Bjarnason,
               S., and K. Watsen, "Bootstrapping Remote Secure Key
               Infrastructures (BRSKI)", draft-ietf-anima-bootstrapping-
-              keyinfra-09 (work in progress), October 2017.
+              keyinfra-15 (work in progress), April 2018.
+
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 26]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
    [I-D.ietf-anima-grasp]
               Bormann, C., Carpenter, B., and B. Liu, "A Generic
@@ -1371,42 +1466,35 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
    [I-D.ietf-anima-voucher]
               Watsen, K., Richardson, M., Pritikin, M., and T. Eckert,
               "Voucher Profile for Bootstrapping Protocols", draft-ietf-
-              anima-voucher-06 (work in progress), October 2017.
+              anima-voucher-07 (work in progress), January 2018.
 
    [I-D.ietf-core-comi]
               Veillette, M., Stok, P., Pelov, A., and A. Bierman, "CoAP
-              Management Interface", draft-ietf-core-comi-01 (work in
-              progress), July 2017.
+              Management Interface", draft-ietf-core-comi-02 (work in
+              progress), December 2017.
 
    [I-D.ietf-core-object-security]
               Selander, G., Mattsson, J., Palombini, F., and L. Seitz,
               "Object Security for Constrained RESTful Environments
-              (OSCORE)", draft-ietf-core-object-security-07 (work in
-              progress), November 2017.
+              (OSCORE)", draft-ietf-core-object-security-12 (work in
+              progress), March 2018.
 
    [I-D.ietf-core-yang-cbor]
               Veillette, M., Pelov, A., Somaraju, A., Turner, R., and A.
               Minaburo, "CBOR Encoding of Data Modeled with YANG",
-              draft-ietf-core-yang-cbor-05 (work in progress), August
-              2017.
+              draft-ietf-core-yang-cbor-06 (work in progress), February
+              2018.
 
    [I-D.ietf-netconf-keystore]
               Watsen, K., "YANG Data Model for a "Keystore" Mechanism",
               draft-ietf-netconf-keystore-04 (work in progress), October
               2017.
 
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 25]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    [I-D.richardson-6tisch-join-enhanced-beacon]
               Dujovne, D. and M. Richardson, "IEEE802.15.4 Informational
               Element encapsulation of 6tisch Join Information", draft-
-              richardson-6tisch-join-enhanced-beacon-02 (work in
-              progress), July 2017.
+              richardson-6tisch-join-enhanced-beacon-03 (work in
+              progress), January 2018.
 
    [I-D.richardson-6tisch-minimal-rekey]
               Richardson, M., "Minimal Security rekeying mechanism for
@@ -1418,15 +1506,24 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               Assistant", draft-richardson-anima-6join-discovery-00
               (work in progress), October 2016.
 
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 27]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    [I-D.selander-ace-cose-ecdhe]
               Selander, G., Mattsson, J., and F. Palombini, "Ephemeral
               Diffie-Hellman Over COSE (EDHOC)", draft-selander-ace-
-              cose-ecdhe-07 (work in progress), July 2017.
+              cose-ecdhe-08 (work in progress), March 2018.
 
    [I-D.vanderstok-ace-coap-est]
-              Kumar, S., Stok, P., Kampanakis, P., Furuhed, M., and S.
-              Raza, "EST over secure CoAP (EST-coaps)", draft-
-              vanderstok-ace-coap-est-02 (work in progress), June 2017.
+              Stok, P., Kampanakis, P., Kumar, S., Richardson, M.,
+              Furuhed, M., and S. Raza, "EST over secure CoAP (EST-
+              coaps)", draft-vanderstok-ace-coap-est-04 (work in
+              progress), January 2018.
 
    [iec62591]
               IEC, ., "62591:2016 Industrial networks - Wireless
@@ -1445,19 +1542,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               <http://standards.ieee.org/findstds/
               standard/802.15.4-2015.html>.
 
-
-
-
-
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 26]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    [ieee802159]
               IEEE Standard, ., "802.15.9-2016 - IEEE Approved Draft
               Recommended Practice for Transport of Key Management
@@ -1475,6 +1559,16 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               Low-Power Wireless Personal Area Networks (6LoWPANs)",
               RFC 6775, DOI 10.17487/RFC6775, November 2012,
               <https://www.rfc-editor.org/info/rfc6775>.
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 28]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
    [RFC7030]  Pritikin, M., Ed., Yee, P., Ed., and D. Harkins, Ed.,
               "Enrollment over Secure Transport", RFC 7030,
@@ -1503,23 +1597,12 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               DOI 10.17487/RFC7252, June 2014, <https://www.rfc-
               editor.org/info/rfc7252>.
 
-
-
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 27]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    [RFC7959]  Bormann, C. and Z. Shelby, Ed., "Block-Wise Transfers in
               the Constrained Application Protocol (CoAP)", RFC 7959,
               DOI 10.17487/RFC7959, August 2016, <https://www.rfc-
               editor.org/info/rfc7959>.
 
-12.2.  Informative References
+11.2.  Informative References
 
    [duckling]
               Stajano, F. and R. Anderson, "The resurrecting duckling:
@@ -1533,15 +1616,25 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               environments", draft-ietf-ace-actors-06 (work in
               progress), November 2017.
 
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 29]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    [I-D.ietf-core-sid]
               Veillette, M. and A. Pelov, "YANG Schema Item iDentifier
-              (SID)", draft-ietf-core-sid-02 (work in progress), October
-              2017.
+              (SID)", draft-ietf-core-sid-03 (work in progress),
+              December 2017.
 
    [I-D.ietf-roll-useofrplinfo]
               Robles, I., Richardson, M., and P. Thubert, "When to use
               RFC 6553, 6554 and IPv6-in-IPv6", draft-ietf-roll-
-              useofrplinfo-19 (work in progress), October 2017.
+              useofrplinfo-22 (work in progress), March 2018.
 
    [ISA100]   "The Technology Behind the ISA100.11a Standard", June
               2010, <http://www.isa100wci.org/Documents/PDF/
@@ -1551,7 +1644,8 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               <https://en.wikipedia.org/w/
               index.php?title=Forward_secrecy&oldid=731318899>.
 
-   [pledge]   Dictionary.com, ., "Dictionary.com Unabridged", 2015,
+   [pledge-word]
+              Dictionary.com, ., "Dictionary.com Unabridged", 2015,
               <http://dictionary.reference.com/browse/pledge>.
 
    [RFC4191]  Draves, R. and D. Thaler, "Default Router Preferences and
@@ -1562,13 +1656,6 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               Element (PCE)-Based Architecture", RFC 4655,
               DOI 10.17487/RFC4655, August 2006, <https://www.rfc-
               editor.org/info/rfc4655>.
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 28]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
    [RFC5056]  Williams, N., "On the Use of Channel Bindings to Secure
               Channels", RFC 5056, DOI 10.17487/RFC5056, November 2007,
@@ -1584,6 +1671,16 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
               Application Protocol (CoAP)", RFC 7641,
               DOI 10.17487/RFC7641, September 2015, <https://www.rfc-
               editor.org/info/rfc7641>.
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 30]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
    [RFC7731]  Hui, J. and R. Kelsey, "Multicast Protocol for Low-Power
               and Lossy Networks (MPL)", RFC 7731, DOI 10.17487/RFC7731,
@@ -1617,15 +1714,6 @@ A.1.2.  Factory provided credentials (if any)
    on the device in a discrete way so that failures can be physically
    traced to the relevant device.
 
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 29]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
 A.1.3.  Credentials to be introduced
 
    The goal of the bootstrap process is to introduce one or more new
@@ -1640,6 +1728,15 @@ A.1.3.  Credentials to be introduced
    3.  alternatively, a network-wide key to be used to authenticate per-
        peer keying of L2 traffic using a mechanism such as provided by
        [ieee802159].
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 31]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
 A.2.  Network Assumptions
 
@@ -1673,15 +1770,6 @@ A.2.1.  Security above and below IP
    Security is required above the IP layer: there are three aspects
    which the credentials in the previous section are to be used.
 
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 30]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    o  to provide for secure connection with a Path Computation Element
       [RFC4655], or other LLC (see ({RFC7554}} section 3).
 
@@ -1698,6 +1786,14 @@ A.2.1.1.  Perfect Forward Secrecy
 
    PFS is important for two reasons: one is that it offers protection
    against the compromise of a node.  It does this by changing the keys
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 32]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
    in a non-deterministic way.  This second property also makes it much
    easier to remove a node from the network, as any node which has not
    participated in the key changing process will find itself no longer
@@ -1729,15 +1825,6 @@ A.3.  Target end-state for join process
    key protected channel between the Join Registrar/Coordinator and the
    pledge, now known as a Joined Node.  This channel may be rekeyed via
    new exchange of asymmetric exponents (ECDH for instance),
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 31]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    authenticated using the domain specific credentials created during
    the join process.
 
@@ -1755,6 +1842,13 @@ Appendix B.  Join Protocol
    situation:
 
    o  no PSK has been configured for the network in which it has joined.
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 33]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
    o  the pledge has no locally defined certificate (no LDevID), only an
       IDevID.
@@ -1785,15 +1879,6 @@ B.1.  Key Agreement process
    [I-D.ietf-anima-bootstrapping-keyinfra], section 3.1.2, and in
    section 4.1.1 of [RFC7030].
 
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 32]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
-
    The JRC will be able to validate the IDevID of the pledge using the
    manufacturer's CA.
 
@@ -1809,6 +1894,17 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
 
    XXX - there could be some disconnect here.  May need additional
    signals here.
+
+
+
+
+
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 34]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
 
 B.2.  Provisional Enrollment process
 
@@ -1826,29 +1922,6 @@ B.2.  Provisional Enrollment process
    leaves the provisional state.
 
    A typical interaction involves the following requests:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 33]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
        +-----------+ +----------+ +-----------+ +----------+
        |           | |          | | Circuit   | | New      |
@@ -1882,6 +1955,13 @@ Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
         |               <------------2.05 OK ------------+
         |               |                                |
 
+
+
+Richardson & Damm       Expires October 29, 2018               [Page 35]
+
+Internet-Draft   6tisch Zero-Touch Secure Join protocol       April 2018
+
+
 Appendix C.  IANA Considerations
 
    This document allocates one value from the subregistry "Address
@@ -1896,15 +1976,6 @@ D.1.  Discovery
    of a temporary address is NOT encouraged as the critial resource on
    the Proxy device is the number of Neighbour Cache Entries that can be
    used for untrusted pledge entries.
-
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 34]
-
-Internet-Draft   6tisch Zero-Touch Secure Join protocol    December 2017
-
 
 D.1.1.  Proxy Discovery Protocol Details
 
@@ -1942,19 +2013,4 @@ Authors' Addresses
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Richardson & Damm         Expires June 14, 2018                [Page 35]
+Richardson & Damm       Expires October 29, 2018               [Page 36]
