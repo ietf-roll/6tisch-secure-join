@@ -914,25 +914,6 @@ There are no changes to the MASA audit log response.
 
 There are no changes to how the Registrar verifies the audit log.
 
-## Use of Secure Transport for Minimal Join
-
-Rather than bootstrap to a public key infrastructure, the secure channel
-MAY instead be for the minimal security join process described in
-{{I-D.ietf-6tisch-minimal-security}}.
-
-The desire to do a minimal-security join process is signaled by the
-Registrar in it's voucher-request by including a 'join-process'
-value of 'minimal'.  The MASA copies this value into the voucher
-that is creates, and also logs this to the audit log.
-
-
-When the secure channel was created with EDHOC, then the keys setup by EDHOC
-are simply used by OSCORE exactly as if they had been Pre-Shared.  The
-keys derived by EDHOC SHOULD be stored by both Registrar and Pledge as their
-long term key should the join process need to be repeated.
-
-
-
 ## EST Integration for PKI bootstrapping
 
 TBD.
@@ -972,6 +953,25 @@ Multiple certificates are not supported.
 ### EST over CoAP
 
 This document and {{I-D.ietf-ace-coap-est}} detail how to run EST over CoAP.
+
+## Use of Secure Transport for Minimal Join
+
+Rather than bootstrap to a public key infrastructure, the secure channel
+MAY instead be for the minimal security join process described in
+{{I-D.ietf-6tisch-minimal-security}}.
+
+The desire to do a minimal-security join process is signaled by the
+Registrar in it's voucher-request by including a 'join-process'
+value of 'minimal'.  The MASA copies this value into the voucher
+that is creates, and also logs this to the audit log.
+
+
+When the secure channel was created with EDHOC, then the keys setup by EDHOC
+are simply used by OSCORE exactly as if they had been Pre-Shared.  The
+keys derived by EDHOC SHOULD be stored by both Registrar and Pledge as their
+long term key should the join process need to be repeated.
+
+
 
 # Reduced security operational modes
 
