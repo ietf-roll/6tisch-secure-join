@@ -1,7 +1,7 @@
 ---
 title: 6tisch Zero-Touch Secure Join protocol
 # abbrev: 6tisch-Secure-Join
-docname: draft-ietf-6tisch-dtsecurity-zerotouch-join-02
+docname: draft-ietf-6tisch-dtsecurity-zerotouch-join-03
 
 # stand_alone: true
 
@@ -23,13 +23,6 @@ author:
         name: Michael Richardson
         org: Sandelman Software Works
         email: mcr+ietf@sandelman.ca
-
-      -
-        ins: B. Damm
-        name: Benjamin Damm
-        org: Silver Spring Networks
-        email: bdamm@ssni.com
-
 
 normative:
   RFC2119:
