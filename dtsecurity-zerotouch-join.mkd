@@ -908,11 +908,20 @@ There are no significant changes from BRSKI.
 
 ## MASA Voucher Response
 
-The MASA responses with a voucher as specified in
-{{I-D.richardson-anima-ace-constrained-voucher}} section 6.2.
+As exaplained in {{I-D.ietf-anima-constrained-voucher}} section 6.3.2, when a
+voucher is returned by the MASA to the JRC, a public key or certificate container
+that will verify the voucher SHOULD also be returned.
 
-This result is communicated back with a MIME Content-Type of
-'application/voucher-cose+cbor'
+In order to do this, the MASA MAY return a multipart/related return, within that
+body, two items SHOULD be returned:
+
+1. An application/voucher-cose+cbor body.
+2. An application/pkcs7-mime; smime-type=certs-only, or an application/SOMETHING containing a Raw Public Key.
+
+A MASA is not obligated to return the public key, and MAY return only the
+application/voucher-cose+cbor object.  In that case, the JRC will be unable to
+validate it.
+
 
 ### Pledge voucher verification
 
