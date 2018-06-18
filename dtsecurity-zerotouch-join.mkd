@@ -427,10 +427,16 @@ provisioned with an 802.1AR (PKIX) certificate installed during the
 manufacturing process.
 
 It is expected that constrained devices will use a signature algorithm
-corresponding to the hardware acceleration that they have, if they have any.
-The anticipated algorithms are the ECDSA P-256 (secp256p1) as SHOULD-, while
-newer devices SHOLD+ begin to appear using EdDSA curves using the 25519
-curves. (EDNOTE details here)
+corresponding to the
+hardware acceleration that they have, if they have any.  The anticipated algorithms are
+the ECDSA P-256 (secp256p1), and SHOULD be supported.
+Newer devices SHOULD begin to appear using EdDSA curves using the 25519
+curves.
+
+The manufacturer will always know what algorithms are available in the
+Pledge, and will use an appropriate one.  The other components that need to
+evaluate the IDevID (the Registrar and MASA) are expected to support all
+common algorithms.
 
 There are a number of simplications detailed later on in this document
 designed to eliminate the need for an ASN.1 parser in the pledge.
@@ -618,10 +624,23 @@ The voucher-request artifact is defined in
 {{I-D.richardson-anima-ace-constrained-voucher}} section 6.1.
 
 For the 6tisch ZSJ protocol defined in this document, only COSE signed
-vouchers as described in {{I-D.richardson-anima-ace-constrained-voucher}}
+vouchers as described in {{I-D.ietf-anima-constrained-voucher}}
 section 6.3.2 are supported.
 
 # Proxying details (Pledge - Proxy - Registrar)
+
+The voucher-request artifact is defined in {{I-D.ietf-anima-constrained-voucher}}.
+
+The 6tisch use of the constrained version differs from the non-constrained version
+in two ways:
+
+1. it does not include the pinned-domain-cert, but rather than pinned-domain-subjet-public-key-info entry.  This accomodates the use of a raw public key to identify the registrar.
+
+2. the pledge voucher-request is never signed.
+
+An appendix shows detailed examples of COSE format voucher requests.
+
+# Proxy details
 
 The role of the Proxy is to facilitate communication.
 In the constrained situation the proxy needs to be stateless as there is
