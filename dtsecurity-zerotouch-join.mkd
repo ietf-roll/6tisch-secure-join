@@ -651,7 +651,13 @@ an unlimited number of potential pledges.
 
 In BRSKI, the pledge discovers the proxy via use of a GRASP M_FLOOD messages
 sent by the proxy.  In 6tisch ZSJ, the existence of the proxy is announced
-by the Enhanced Beacon defined in {{I-D.richardson-6tisch-join-enhanced-beacon}}.
+by the Enhanced Beacon message described in
+{{I-D.richardson-6tisch-enrollment-enhanced-beacon}}.
+The proxy as described by {{I-D.ietf-6tisch-minimal-security}} section 10 is
+to be used in an identical fashion when EDHOC and OSCOAP are used.
+
+When DTLS security is provided, then the proxy mechanism described in TBD
+must be used.
 
 ## CoAP connection to Registrar
 
@@ -671,8 +677,8 @@ GRASP messages.
 
 In the constrained network, the proxies are optionally configured with the
 address of the JRC by the Join Response in
-{{I-D.ietf-6tisch-minimal-security}} section 8. As specified in that section,
-if the address of the registrar otherwise defaults to be that of the DODAG root.
+in {{I-D.ietf-6tisch-minimal-security}} section 9.3.2.
+(As described in that section, the address of the registrar otherwise defaults to be that of the DODAG root)
 
 Whether or not a 6LR will announce itself as a possible Join Proxy is
 outside the scope of this document.
