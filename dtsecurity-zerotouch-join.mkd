@@ -689,6 +689,14 @@ outside the scope of this document.
 BRSKI is specified to run over HTTPS. This document respecifies it to
 run over CoAP with either DTLS or EDHOC-provided OSCOAP security.
 
+BRSKI introduces the concept of a provisional state for EST.
+
+The same situation must also be added to DTLS: a situation where the connection is active but the identity of the Registar has not yet been confirmed.
+The DTLS MUST validate that the exchange has
+been signed by the Raw Public Key that is presented by the Server, even though there is
+as yet no trust in that key.  Such a key is often available through APIs that provide for
+channel binding, such as described in {{RFC5056}}.
+
 There is an emerging (hybrid) possibility of DTLS-providing the OSCOAP
 security, but such a specification does not yet exist, and this document
 does at this point specify it.
@@ -820,6 +828,10 @@ There are no changes.  The connection from the Registrar to MASA is still HTTPS.
 ## Registrar Requests Voucher from MASA
 
 There are no change from BRSKI, as this step is between two non-constrained devices.
+
+The format of the voucher is COSE, which implies changes to both the Registrar and
+the MASA,
+but semantically the content is the same.
 
 The format of the voucher is COSE, which implies changes to both the
 Registrar and the MASA, but semantically the content is the same.
